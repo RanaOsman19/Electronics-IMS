@@ -304,3 +304,50 @@ begin
       and supplierid = (select supplierid from user where userid = p_userid);
 end$$
 delimiter ;
+
+
+delimiter $$
+create procedure delete_inventory(
+    in p_userid int,
+    in p_inventoryid int
+)
+begin
+    if (select role from user where userid = p_userid) <> 'admin' then
+        signal sqlstate '45000' set message_text = 'admin only';
+    end if;
+
+    delete from inventory
+    where inventoryid = p_inventoryid;
+end$$
+delimiter ;
+
+
+delimiter $$
+create procedure update_inventory_stock(
+    in p_userid int,
+    in p_inventoryid int,
+    in p_newstock int
+)
+begin
+    declare old_stock int;
+
+    if (select role from user where userid = p_userid) <> 'admin' then
+        signal sqlstate '45000' set message_text = 'admin only';
+    end if;
+
+    select stocklevel into old_stock
+    from inventory
+    where inventoryid = p_inventoryid;
+
+    update inventory
+    set stocklevel = p_newstock,
+        lastupdated = now()
+    where inventoryid = p_inventoryid;
+
+    insert into inventory_audit
+    (inventoryid, old_stocklevel, new_stocklevel, change_type, changed_by)
+    values
+    (p_inventoryid, old_stock, p_newstock, 'manual_adjustment', p_userid);
+end$$
+delimiter ;
+

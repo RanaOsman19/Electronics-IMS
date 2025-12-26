@@ -145,6 +145,8 @@ public class AdminDashboard extends JFrame {
 
         mainPanel.add(salesPanel, "Sales");
 
+        loadSales(salesModel);
+
         // -------------------- Low Stock Panel --------------------
         JPanel alertPanel = new JPanel(new BorderLayout());
 
@@ -156,6 +158,7 @@ public class AdminDashboard extends JFrame {
         alertPanel.add(new JScrollPane(alertTable), BorderLayout.CENTER);
 
         mainPanel.add(alertPanel, "Alerts");
+        loadLowStockAlerts(alertModel);
 
         // -------------------- Load inventory from view --------------------
         loadInventoryData(inventoryTableModel);
@@ -171,6 +174,8 @@ public class AdminDashboard extends JFrame {
         purchasePanel.add(new JScrollPane(poTable), BorderLayout.CENTER);
 
         mainPanel.add(purchasePanel, "Purchases");
+
+        loadPurchaseOrders(poModel);
 
         // -------------------- Products Panel --------------------
         JPanel productsPanel = new JPanel(new BorderLayout());
@@ -194,6 +199,7 @@ public class AdminDashboard extends JFrame {
         productsPanel.add(productBtns, BorderLayout.SOUTH);
 
         mainPanel.add(productsPanel, "Products");
+        loadProducts(productModel);
 
         // -------------------- Button Actions --------------------
         addButton.addActionListener(e -> addInventory(inventoryTableModel));
@@ -203,8 +209,13 @@ public class AdminDashboard extends JFrame {
         // Menu actions
         menuItemInventory.addActionListener(e -> cardLayout.show(mainPanel, "Inventory"));
         menuItemSales.addActionListener(e -> cardLayout.show(mainPanel, "Sales"));
-        menuItemLowStock.addActionListener(e -> cardLayout.show(mainPanel, "LowStock"));
+        menuItemLowStock.addActionListener(e -> cardLayout.show(mainPanel, "Alerts"));
+        productsItem.addActionListener(e -> cardLayout.show(mainPanel, "Products"));
+        purchaseOrdersItem.addActionListener(e -> cardLayout.show(mainPanel, "Purchases"));
         menuItemLogout.addActionListener(e -> logout());
+
+        add(mainPanel);
+
     }
 
     private void loadInventoryData(DefaultTableModel tableModel) {
@@ -234,13 +245,14 @@ public class AdminDashboard extends JFrame {
     private void loadProducts(DefaultTableModel model) {
         model.setRowCount(0);
         try (Connection c = DBConnection.getConnection();
-                PreparedStatement ps = c.prepareStatement("SELECT * FROM product");
+                PreparedStatement ps = c.prepareStatement(
+                        "SELECT productid, product_name, sku, price FROM product_details");
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 model.addRow(new Object[] {
                         rs.getInt("productid"),
-                        rs.getString("name"),
+                        rs.getString("product_name"),
                         rs.getString("sku"),
                         rs.getDouble("price")
                 });
@@ -254,16 +266,35 @@ public class AdminDashboard extends JFrame {
         model.setRowCount(0);
         try (Connection c = DBConnection.getConnection();
                 PreparedStatement ps = c.prepareStatement(
-                        "SELECT po.purchaseorderid, s.name, po.orderdate, po.status " +
-                                "FROM purchaseorder po JOIN supplier s ON po.supplierid = s.supplierid");
+                        "SELECT purchaseorderid, supplier_name, orderdate, status FROM purchase_order_summary");
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 model.addRow(new Object[] {
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getDate(3),
-                        rs.getString(4)
+                        rs.getInt("purchaseorderid"),
+                        rs.getString("supplier_name"),
+                        rs.getDate("orderdate"),
+                        rs.getString("status")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadSales(DefaultTableModel model) {
+        model.setRowCount(0);
+        try (Connection c = DBConnection.getConnection();
+                PreparedStatement ps = c.prepareStatement(
+                        "SELECT salesorderid, customer_email, orderdate, order_total FROM sales_order_summary");
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[] {
+                        rs.getInt("salesorderid"),
+                        rs.getString("customer_email"),
+                        rs.getDate("orderdate"),
+                        rs.getDouble("order_total")
                 });
             }
         } catch (Exception e) {
@@ -313,19 +344,20 @@ public class AdminDashboard extends JFrame {
 
         int inventoryId = (int) table.getValueAt(selectedRow, 0);
         String currentStock = table.getValueAt(selectedRow, 3).toString();
-        String newStock = JOptionPane.showInputDialog(this, "Enter new stock level:", currentStock);
+
+        String newStock = JOptionPane.showInputDialog(
+                this,
+                "Enter new stock level:",
+                currentStock);
+
         if (newStock != null) {
             try (Connection conn = DBConnection.getConnection();
-                    CallableStatement stmt = conn.prepareCall("{CALL receive_purchase(?, ?, ?, ?, ?)}")) {
+                    CallableStatement stmt = conn.prepareCall("{CALL update_inventory_stock(?, ?, ?)}")) {
 
-                // Note: receive_purchase can be reused to update stock, assuming PO/productId
-                // exist
-                // For simplicity, we'll update stock directly using procedure parameters
                 stmt.setInt(1, userId);
                 stmt.setInt(2, inventoryId);
-                stmt.setInt(3, 0); // purchaseorderid not needed for manual adjustment
-                stmt.setInt(4, 0); // productid placeholder
-                stmt.setInt(5, Integer.parseInt(newStock));
+                stmt.setInt(3, Integer.parseInt(newStock));
+
                 stmt.execute();
 
                 JOptionPane.showMessageDialog(this, "Stock updated successfully!");
@@ -333,7 +365,10 @@ public class AdminDashboard extends JFrame {
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Failed to update stock: " + ex.getMessage(), "Error",
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Failed to update stock: " + ex.getMessage(),
+                        "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -376,19 +411,20 @@ public class AdminDashboard extends JFrame {
     private void loadLowStockAlerts(DefaultTableModel model) {
         model.setRowCount(0);
         try (Connection c = DBConnection.getConnection();
-            PreparedStatement ps = c.prepareStatement("SELECT * FROM low_stock_alerts");
-            ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = c.prepareStatement("SELECT * FROM low_stock_alerts");
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getInt("inventoryid"),
-                    rs.getString("product"),
-                    rs.getString("location"),
-                    rs.getInt("stocklevel"),
-                    rs.getInt("reorderpoint")
+                model.addRow(new Object[] {
+                        rs.getInt("inventoryid"),
+                        rs.getString("product"),
+                        rs.getString("location"),
+                        rs.getInt("stocklevel"),
+                        rs.getInt("reorderpoint")
                 });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+}
