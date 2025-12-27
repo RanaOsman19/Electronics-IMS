@@ -1,0 +1,3 @@
+inventoryid,product,location,stocklevel,reorderpoint
+2,wireless mouse,main warehouse,4,5
+4,macBook,main warehouse,0,3

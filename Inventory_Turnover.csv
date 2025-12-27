@@ -1,0 +1,4 @@
+productid,product_name,total_sold,avg_stock,turnover_ratio
+1,laptop pro,1,25.0000,0.0400
+2,wireless mouse,null,4.0000,null
+4,macBook,null,0.0000,0.0000

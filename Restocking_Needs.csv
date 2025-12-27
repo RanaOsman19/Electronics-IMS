@@ -1,0 +1,3 @@
+inventoryid,product_name,stocklevel,reorderpoint,qty_to_order
+2,wireless mouse,4,5,1
+4,macBook,0,3,3
