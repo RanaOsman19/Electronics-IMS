@@ -45,7 +45,7 @@ select
     i.stocklevel,
     i.reorderpoint,
     case
-        when i.stocklevel <= i.reorderpoint then 'low'
+        when i.stocklevel <= i.reorderpoint then 'needs restock'
         else 'ok'
     end as stock_status,
     i.lastupdated
@@ -154,3 +154,45 @@ join purchaseorderitem poi on po.purchaseorderid = poi.purchaseorderid
 group by
     s.supplierid,
     s.name;
+
+
+create or replace view inventory_turnover as
+select 
+    p.productid,
+    p.name as product_name,
+    sum(soi.quantity) as total_sold,
+    avg(i.stocklevel) as avg_stock,
+    case 
+        when avg(i.stocklevel) = 0 then 0
+        else sum(soi.quantity)/avg(i.stocklevel)
+    end as turnover_ratio
+from product p
+left join inventory i on p.productid = i.productid
+left join salesorderitem soi on p.productid = soi.productid
+group by p.productid, p.name;
+
+
+create or replace view restocking_needs as
+select 
+    i.inventoryid,
+    p.name as product_name,
+    i.stocklevel,
+    i.reorderpoint,
+    i.reorderpoint - i.stocklevel as qty_to_order
+from inventory i
+join product p on i.productid = p.productid
+where i.stocklevel < i.reorderpoint;
+ 
+ 
+ create or replace view sales_trends as
+select 
+    p.productid,
+    p.name as product_name,
+    year(so.orderdate) as year,
+    month(so.orderdate) as month,
+    sum(soi.quantity) as total_quantity_sold,
+    sum(soi.quantity * soi.sellingprice) as total_revenue
+from salesorderitem soi
+join salesorder so on soi.salesorderid = so.salesorderid
+join product p on soi.productid = p.productid
+group by p.productid, year(so.orderdate), month(so.orderdate);

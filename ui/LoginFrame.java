@@ -119,18 +119,26 @@ public class LoginFrame extends JFrame {
             if (rs.next()) {
                 int userId = rs.getInt("userid");
                 String role = rs.getString("role");
-                Integer supplierId = rs.getObject("supplierid") != null ? rs.getInt("supplierid") : null;
+
+                // Safely handle supplierId
+                Object supObj = rs.getObject("supplierid");
+                Integer supplierId = (supObj != null) ? ((Number) supObj).intValue() : null;
 
                 messageLabel.setText("Login successful!");
                 messageLabel.setForeground(new Color(0, 150, 0));
 
-                if (role.equals("admin")) {
+                // Open appropriate dashboard
+                if ("admin".equalsIgnoreCase(role)) {
                     SwingUtilities.invokeLater(() -> new AdminDashboard(userId).setVisible(true));
+                } else if ("supplier".equalsIgnoreCase(role)) {
+                    if (supplierId == null) {
+                        JOptionPane.showMessageDialog(this,
+                                "Supplier account not linked to a supplier record!",
+                                "Login Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    SwingUtilities.invokeLater(() -> new SupplierDashboard(userId, supplierId).setVisible(true));
                 }
-                // else if (role.equals("supplier")) {
-                // SwingUtilities.invokeLater(() -> new SupplierDashboard(userId,
-                // supplierId).setVisible(true));
-                // }
 
                 this.dispose();
             } else {
@@ -140,7 +148,7 @@ public class LoginFrame extends JFrame {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            messageLabel.setText("Database error");
+            messageLabel.setText("Database error: " + ex.getMessage());
             messageLabel.setForeground(Color.RED);
         }
     }

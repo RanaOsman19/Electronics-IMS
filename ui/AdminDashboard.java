@@ -24,6 +24,13 @@ public class AdminDashboard extends JFrame {
         initUI();
     }
 
+    private DefaultTableModel inventoryTableModel;
+    private DefaultTableModel productModel;
+    private DefaultTableModel poModel;
+    private DefaultTableModel salesModel;
+    private DefaultTableModel alertModel;
+    private DefaultTableModel supplierModel;
+
     private void initUI() {
         // ---------------- Menu Bar ----------------
         JMenuBar menuBar = new JMenuBar();
@@ -105,19 +112,23 @@ public class AdminDashboard extends JFrame {
         // ---------------- Main Panel ----------------
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-        mainPanel.setBackground(new Color(230, 230, 230));
+        mainPanel.setBackground(new Color(245, 220, 245));
+        ;
 
         // ---------------- Inventory Panel ----------------
         JPanel inventoryPanel = new JPanel(new BorderLayout());
-        inventoryPanel.setBackground(new Color(245, 245, 245));
+        inventoryPanel.setBackground(new Color(245, 220, 245));
+        ;
         JLabel inventoryTitle = new JLabel("Inventory Overview", SwingConstants.CENTER);
         inventoryTitle.setFont(new Font("Serif", Font.BOLD, 32));
         inventoryTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         inventoryPanel.add(inventoryTitle, BorderLayout.NORTH);
 
         String[] columns = { "Inventory ID", "Product", "Location", "Stock", "Reorder Point", "Status" };
-        DefaultTableModel inventoryTableModel = new DefaultTableModel(columns, 0);
+        inventoryTableModel = new DefaultTableModel(columns, 0);
         JTable inventoryTable = new JTable(inventoryTableModel);
+        inventoryTable.setBackground(new Color(30, 40, 70));
+        inventoryTable.setForeground(Color.white);
         inventoryTable.setFont(new Font("Serif", Font.PLAIN, 25));
         inventoryTable.setRowHeight(28);
         inventoryPanel.add(new JScrollPane(inventoryTable), BorderLayout.CENTER);
@@ -136,15 +147,19 @@ public class AdminDashboard extends JFrame {
         buttonsPanel.add(editButton);
         buttonsPanel.add(deleteButton);
         buttonsPanel.add(editReorderButton);
+        buttonsPanel.setBackground(new Color(245, 220, 245));
         inventoryPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         mainPanel.add(inventoryPanel, "Inventory");
 
         // ---------------- Supplier Panel ----------------
         JPanel supplierPanel = new JPanel(new BorderLayout());
-        String[] supplierCols = { "ID", "Name", "Email", "Phone", "City", "Country", "Min Order" };
-        DefaultTableModel supplierModel = new DefaultTableModel(supplierCols, 0);
+        supplierPanel.setBackground(new Color(245, 220, 245));
+        String[] supplierCols = { "ID", "Name", "Email", "Phone", "City", "Country", "Min Order", "Products" };
+        supplierModel = new DefaultTableModel(supplierCols, 0);
         JTable supplierTable = new JTable(supplierModel);
+        supplierTable.setBackground(new Color(30, 40, 70));
+        supplierTable.setForeground(Color.white);
         supplierTable.setFont(new Font("Serif", Font.PLAIN, 18));
         supplierTable.setRowHeight(25);
 
@@ -155,20 +170,27 @@ public class AdminDashboard extends JFrame {
 
         JPanel suppBtns = new JPanel();
         JButton addSupp = new JButton("Add Supplier");
-        JButton editSupp = new JButton("Edit Contact");
+        JButton editSupp = new JButton("Edit info");
         JButton deleteSupp = new JButton("Delete");
+        addSupp.setFont(new Font("Serif", Font.BOLD, 25));
+        editSupp.setFont(new Font("Serif", Font.BOLD, 25));
+        deleteSupp.setFont(new Font("Serif", Font.BOLD, 25));
         suppBtns.add(addSupp);
         suppBtns.add(editSupp);
         suppBtns.add(deleteSupp);
+        suppBtns.setBackground(new Color(245, 220, 245));
         supplierPanel.add(suppBtns, BorderLayout.SOUTH);
 
         mainPanel.add(supplierPanel, "Suppliers");
 
         // ---------------- Sales Panel ----------------
         JPanel salesPanel = new JPanel(new BorderLayout());
+        salesPanel.setBackground(new Color(245, 220, 245));
         String[] salesCols = { "Order ID", "Customer", "Date", "Total" };
-        DefaultTableModel salesModel = new DefaultTableModel(salesCols, 0);
+        salesModel = new DefaultTableModel(salesCols, 0);
         JTable salesTable = new JTable(salesModel);
+        salesTable.setBackground(new Color(30, 40, 70));
+        salesTable.setForeground(Color.white);
         salesTable.setFont(new Font("Serif", Font.PLAIN, 25));
         salesTable.setRowHeight(28);
 
@@ -183,26 +205,30 @@ public class AdminDashboard extends JFrame {
         JButton addSaleBtn = new JButton("Add Sale");
         JButton editSaleBtn = new JButton("Edit Sale");
         JButton deleteSaleBtn = new JButton("Delete Sale");
-        addSaleBtn.setFont(menuItemFont);
-        editSaleBtn.setFont(menuItemFont);
-        deleteSaleBtn.setFont(menuItemFont);
+        addSaleBtn.setFont(new Font("Serif", Font.BOLD, 25));
+        editSaleBtn.setFont(new Font("Serif", Font.BOLD, 25));
+        deleteSaleBtn.setFont(new Font("Serif", Font.BOLD, 25));
         salesBtnPanel.add(addSaleBtn);
         salesBtnPanel.add(editSaleBtn);
         salesBtnPanel.add(deleteSaleBtn);
+        salesBtnPanel.setBackground(new Color(245, 220, 245));
         salesPanel.add(salesBtnPanel, BorderLayout.SOUTH);
 
         mainPanel.add(salesPanel, "Sales");
 
         // ---------------- Low Stock Panel ----------------
         JPanel alertPanel = new JPanel(new BorderLayout());
+        alertPanel.setBackground(new Color(245, 220, 245));
         String[] alertCols = { "Inventory ID", "Product", "Location", "Stock", "Reorder Point", "Action" };
-        DefaultTableModel alertModel = new DefaultTableModel(alertCols, 0);
+        alertModel = new DefaultTableModel(alertCols, 0);
         JTable alertTable = new JTable(alertModel) {
             public boolean isCellEditable(int row, int column) {
-                return column == 5; // Only "Action" column editable for button
+                return column == 5;
             }
         };
         alertTable.setFont(new Font("Serif", Font.PLAIN, 25));
+        alertTable.setBackground(new Color(30, 40, 70));
+        alertTable.setForeground(Color.white);
         alertTable.setRowHeight(28);
         alertPanel.add(new JScrollPane(alertTable), BorderLayout.CENTER);
         mainPanel.add(alertPanel, "Alerts");
@@ -214,9 +240,12 @@ public class AdminDashboard extends JFrame {
 
         // ---------------- Purchase Orders Panel ----------------
         JPanel purchasePanel = new JPanel(new BorderLayout());
+        purchasePanel.setBackground(new Color(245, 220, 245));
         String[] poCols = { "PO ID", "Supplier", "Order Date", "Expected Date", "Status" };
-        DefaultTableModel poModel = new DefaultTableModel(poCols, 0);
+        poModel = new DefaultTableModel(poCols, 0);
         JTable poTable = new JTable(poModel);
+        poTable.setBackground(new Color(30, 40, 70));
+        poTable.setForeground(Color.white);
         poTable.setFont(new Font("Serif", Font.PLAIN, 25));
         poTable.setRowHeight(28);
 
@@ -234,16 +263,20 @@ public class AdminDashboard extends JFrame {
         JPanel poBtns = new JPanel();
         poBtns.add(createPO);
         poBtns.add(updatePOStatus);
+        poBtns.setBackground(new Color(245, 220, 245));
         purchasePanel.add(poBtns, BorderLayout.SOUTH);
 
         mainPanel.add(purchasePanel, "Purchases");
 
         // ---------------- Products Panel ----------------
         JPanel productsPanel = new JPanel(new BorderLayout());
+        productsPanel.setBackground(new Color(245, 220, 245));
         String[] productCols = { "Product ID", "Name", "SKU", "Price", "VAT", "Category" };
-        DefaultTableModel productModel = new DefaultTableModel(productCols, 0);
+        productModel = new DefaultTableModel(productCols, 0);
         JTable productTable = new JTable(productModel);
+        productTable.setBackground(new Color(30, 40, 70));
         productTable.setFont(new Font("Serif", Font.PLAIN, 25));
+        productTable.setForeground(Color.white);
         productTable.setRowHeight(28);
 
         JLabel productsTitle = new JLabel("Product Management", SwingConstants.CENTER);
@@ -264,6 +297,7 @@ public class AdminDashboard extends JFrame {
         productBtns.add(addProduct);
         productBtns.add(editProduct);
         productBtns.add(deleteProduct);
+        productBtns.setBackground(new Color(245, 220, 245));
         productsPanel.add(productBtns, BorderLayout.SOUTH);
 
         mainPanel.add(productsPanel, "Products");
@@ -304,15 +338,55 @@ public class AdminDashboard extends JFrame {
         updatePOStatus.addActionListener(e -> updatePOStatus(poTable, poModel));
 
         createPO.addActionListener(e -> {
-            int supplierId = Integer.parseInt(JOptionPane.showInputDialog(this, "Supplier ID:"));
-            createPurchaseOrder(userId, supplierId, poTable); // poTable is your JTable in Purchases panel
-            loadPurchaseOrders((DefaultTableModel) poTable.getModel()); // refresh table after creation
+            try {
+                int supplierId = Integer.parseInt(JOptionPane.showInputDialog(this, "Supplier ID:"));
+                int itemCount = Integer.parseInt(JOptionPane.showInputDialog(this, "Number of items:"));
+                if (itemCount <= 0)
+                    return;
+
+                StringBuilder json = new StringBuilder("[");
+                for (int i = 0; i < itemCount; i++) {
+                    int inventoryId = Integer
+                            .parseInt(JOptionPane.showInputDialog(this, "Inventory ID for item " + (i + 1)));
+                    int productId = Integer
+                            .parseInt(JOptionPane.showInputDialog(this, "Product ID for item " + (i + 1)));
+                    int qty = Integer.parseInt(JOptionPane.showInputDialog(this, "Quantity for item " + (i + 1)));
+                    double cost = 0;
+                    try (Connection conn = DBConnection.getConnection();
+                            PreparedStatement ps = conn
+                                    .prepareStatement("SELECT price FROM product_details WHERE productid=?")) {
+                        ps.setInt(1, productId);
+                        ResultSet rs = ps.executeQuery();
+                        if (rs.next()) {
+                            cost = rs.getDouble("price");
+                        }
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(this, "Error fetching unit price: " + ex.getMessage());
+                        return;
+                    }
+
+                    json.append("{")
+                            .append("\"inventoryid\":").append(inventoryId).append(",")
+                            .append("\"productid\":").append(productId).append(",")
+                            .append("\"qty\":").append(qty).append(",")
+                            .append("\"cost\":").append(cost)
+                            .append("}");
+                    if (i < itemCount - 1)
+                        json.append(",");
+                }
+                json.append("]");
+
+                createPurchaseOrder(userId, supplierId, json.toString());
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+            }
         });
 
         addSaleBtn.addActionListener(e -> {
             String customerEmail = JOptionPane.showInputDialog(this, "Customer Email:");
-            addSale(userId, customerEmail, salesTable); // salesTable is your JTable in Sales panel
-            loadSales((DefaultTableModel) salesTable.getModel()); // refresh table after adding sale
+            addSale(userId, customerEmail, salesTable);
+            loadSales((DefaultTableModel) salesTable.getModel());
         });
 
         editSaleBtn.addActionListener(e -> editSale(salesTable, salesModel, inventoryTableModel, alertModel));
@@ -417,6 +491,46 @@ public class AdminDashboard extends JFrame {
         }
     }
 
+    private void loadSuppliers(DefaultTableModel model) {
+        model.setRowCount(0);
+        String query = "select s.supplierid, s.name, s.email, s.phone, s.city, s.country, s.minordervalue, " +
+                "group_concat(p.name separator ', ') as products " +
+                "from supplier_profile s " +
+                "left join productsupplier sp on s.supplierid = sp.supplierid " +
+                "left join product p on sp.productid = p.productid           " +
+                "group by s.supplierid, s.name, s.email, s.phone, s.city, s.country, s.minordervalue";
+
+        try (Connection conn = DBConnection.getConnection();
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(query)) {
+
+            while (rs.next()) {
+                model.addRow(new Object[] {
+                        rs.getInt("supplierid"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("city"),
+                        rs.getString("country"),
+                        rs.getDouble("minordervalue"),
+                        rs.getString("products")
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshAllPanels() {
+        loadInventoryData(inventoryTableModel);
+        loadProducts(productModel);
+        loadPurchaseOrders(poModel);
+        loadSales(salesModel);
+        loadLowStockAlerts(alertModel);
+        loadSuppliers(supplierModel);
+    }
+
     // ---------------- Inventory CRUD ----------------
     private void addInventory(DefaultTableModel model) {
         JTextField productIdField = new JTextField();
@@ -444,6 +558,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void editInventory(JTable table, DefaultTableModel model) {
@@ -469,6 +584,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void editReorderPoint(JTable table, DefaultTableModel model) {
@@ -494,6 +610,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void deleteInventory(JTable table, DefaultTableModel model) {
@@ -518,23 +635,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
-    }
-
-    private void loadSuppliers(DefaultTableModel model) {
-        model.setRowCount(0);
-        try (Connection conn = DBConnection.getConnection();
-                Statement st = conn.createStatement();
-                ResultSet rs = st.executeQuery("SELECT * FROM supplier_profile")) {
-            while (rs.next()) {
-                model.addRow(new Object[] {
-                        rs.getInt("supplierid"), rs.getString("name"), rs.getString("email"),
-                        rs.getString("phone"), rs.getString("city"), rs.getString("country"),
-                        rs.getDouble("minordervalue")
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        refreshAllPanels();
     }
 
     private void addSupplier(DefaultTableModel model) {
@@ -550,22 +651,21 @@ public class AdminDashboard extends JFrame {
         if (JOptionPane.showConfirmDialog(this, msg, "New Supplier",
                 JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             try (Connection conn = DBConnection.getConnection();
-                    CallableStatement cs = conn.prepareCall("{CALL add_supplier(?,?,?,?,?,?,?,?,?)}")) {
+                    CallableStatement cs = conn.prepareCall("{CALL add_supplier(?,?,?,?,?,?,?)}")) {
                 cs.setInt(1, userId);
                 cs.setString(2, name.getText());
                 cs.setString(3, email.getText());
                 cs.setString(4, phone.getText());
-                cs.setString(5, ""); // Street (optional)
-                cs.setString(6, city.getText());
-                cs.setString(7, country.getText());
-                cs.setDouble(8, Double.parseDouble(minOrder.getText()));
-                cs.setString(9, "USD"); // Currency
+                cs.setString(5, city.getText());
+                cs.setString(6, country.getText());
+                cs.setDouble(7, Double.parseDouble(minOrder.getText()));
                 cs.execute();
                 loadSuppliers(model);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void editSupplier(JTable table, DefaultTableModel model) {
@@ -577,35 +677,26 @@ public class AdminDashboard extends JFrame {
 
         int supplierId = (int) table.getValueAt(row, 0);
 
-        JTextField name = new JTextField((String) table.getValueAt(row, 1));
         JTextField email = new JTextField((String) table.getValueAt(row, 2));
         JTextField phone = new JTextField((String) table.getValueAt(row, 3));
-        JTextField city = new JTextField((String) table.getValueAt(row, 4));
-        JTextField country = new JTextField((String) table.getValueAt(row, 5));
         JTextField minOrder = new JTextField(table.getValueAt(row, 6).toString());
 
         Object[] msg = {
-                "Name:", name,
                 "Email:", email,
                 "Phone:", phone,
-                "City:", city,
-                "Country:", country,
                 "Min Order:", minOrder
         };
 
         if (JOptionPane.showConfirmDialog(this, msg, "Edit Supplier",
                 JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             try (Connection conn = DBConnection.getConnection();
-                    CallableStatement cs = conn.prepareCall("{CALL update_supplier(?,?,?,?,?,?,?,?)}")) {
+                    CallableStatement cs = conn.prepareCall("{CALL update_supplier(?,?,?,?,?)}")) {
 
                 cs.setInt(1, userId);
                 cs.setInt(2, supplierId);
-                cs.setString(3, name.getText());
-                cs.setString(4, email.getText());
-                cs.setString(5, phone.getText());
-                cs.setString(6, city.getText());
-                cs.setString(7, country.getText());
-                cs.setDouble(8, Double.parseDouble(minOrder.getText()));
+                cs.setString(3, email.getText());
+                cs.setString(4, phone.getText());
+                cs.setDouble(5, Double.parseDouble(minOrder.getText()));
 
                 cs.execute();
                 JOptionPane.showMessageDialog(this, "Supplier updated!");
@@ -615,6 +706,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void deleteSupplier(JTable table, DefaultTableModel model) {
@@ -642,6 +734,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     // ---------------- Products CRUD ----------------
@@ -671,6 +764,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void editProduct(JTable table, DefaultTableModel model) {
@@ -703,6 +797,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void deleteProduct(JTable table, DefaultTableModel model) {
@@ -722,46 +817,22 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     // ---------------- Purchase Orders ----------------
-    public void createPurchaseOrder(int userId, int supplierId, JTable itemsTable) {
+    public void createPurchaseOrder(int userId, int supplierId, String itemsJson) {
         try (Connection conn = DBConnection.getConnection()) {
-
-            // Build JSON array from JTable
-            DefaultTableModel model = (DefaultTableModel) itemsTable.getModel();
-            StringBuilder json = new StringBuilder("[");
-
-            for (int i = 0; i < model.getRowCount(); i++) {
-                int inventoryId = (int) model.getValueAt(i, 0); // inventoryid column
-                int productId = (int) model.getValueAt(i, 1); // productid column
-                int qty = (int) model.getValueAt(i, 2); // qty column
-                double cost = (double) model.getValueAt(i, 3); // unit cost column
-
-                json.append("{")
-                        .append("\"inventoryid\":").append(inventoryId).append(",")
-                        .append("\"productid\":").append(productId).append(",")
-                        .append("\"qty\":").append(qty).append(",")
-                        .append("\"cost\":").append(cost)
-                        .append("}");
-
-                if (i < model.getRowCount() - 1)
-                    json.append(",");
-            }
-            json.append("]");
-
-            // Call stored procedure
             CallableStatement cs = conn.prepareCall("{call create_purchase_order(?,?,?)}");
             cs.setInt(1, userId);
             cs.setInt(2, supplierId);
-            cs.setString(3, json.toString());
-
+            cs.setString(3, itemsJson);
             cs.execute();
             JOptionPane.showMessageDialog(null, "Purchase Order created successfully!");
-
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
         }
+        refreshAllPanels();
     }
 
     private void updatePOStatus(JTable table, DefaultTableModel model) {
@@ -788,6 +859,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     // ---------------- Sales CRUD ----------------
@@ -828,6 +900,7 @@ public class AdminDashboard extends JFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
         }
+        refreshAllPanels();
     }
 
     private void editSale(JTable table, DefaultTableModel salesModel, DefaultTableModel invModel,
@@ -854,6 +927,7 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void deleteSale(JTable table, DefaultTableModel salesModel, DefaultTableModel invModel,
@@ -879,10 +953,11 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, e.getMessage());
             }
         }
+        refreshAllPanels();
     }
 
     private void exportReport() {
-        String[] reportTypes = { "Inventory Turnover", "Low Stock Alerts", "Restocking Needs" };
+        String[] reportTypes = { "Inventory Turnover", "Low Stock Alerts", "Restocking Needs", "sales trends" };
         String selectedReport = (String) JOptionPane.showInputDialog(
                 this,
                 "Select report to export:",
@@ -893,9 +968,7 @@ public class AdminDashboard extends JFrame {
                 reportTypes[0]);
 
         if (selectedReport == null)
-            return; // User canceled
-
-        // Choose file location
+            return;
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save CSV Report");
         fileChooser.setSelectedFile(new java.io.File(selectedReport.replace(" ", "_") + ".csv"));
@@ -916,6 +989,9 @@ public class AdminDashboard extends JFrame {
                 break;
             case "Restocking Needs":
                 query = "SELECT * FROM restocking_needs";
+                break;
+            case "sales trends":
+                query = "SELECT * FROM sales_trends";
                 break;
         }
 
